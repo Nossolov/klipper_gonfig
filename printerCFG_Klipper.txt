@@ -1,0 +1,242 @@
+   # This file serves as documentation for config parameters of delta
+# style printers. One may copy and edit this file to configure a new
+# delta printer. Only parameters unique to delta printers are
+# described here - see the "example.cfg" file for description of
+# common config parameters.
+
+# DO NOT COPY THIS FILE WITHOUT CAREFULLY READING AND UPDATING IT
+# FIRST. Incorrectly configured parameters may cause damage.
+
+# The stepper_a section describes the stepper controlling the front
+# left tower (at 210 degrees). This section also controls the homing
+# parameters (homing_speed, homing_retract_dist) for all towers.
+[stepper_a]
+step_pin: ar54
+dir_pin: ar55
+enable_pin: !ar38
+step_distance: 0.003125
+endstop_pin: ^!ar2
+homing_speed: 30
+#position_endstop: 448.0 
+#   Distance (in mm) between the nozzle and the bed when the nozzle is
+#   in the center of the build area and the endstop triggers. This
+#   parameter must be provided for stepper_a; for stepper_b and
+#   stepper_c this parameter defaults to the value specified for
+#   stepper_a.
+#arm_length: 426.51
+#   Length (in mm) of the diagonal rod that connects this tower to the
+#   print head. This parameter must be provided for stepper_a; for
+#   stepper_b and stepper_c this parameter defaults to the value
+#   specified for stepper_a.
+#angle:
+#   This option specifies the angle (in degrees) that the tower is
+#   at. The default is 210 for stepper_a, 330 for stepper_b, and 90
+#   for stepper_c.
+
+# The stepper_b section describes the stepper controlling the front
+# right tower (at 330 degrees).
+[stepper_b]
+step_pin: ar60
+dir_pin: ar61
+enable_pin: !ar56
+step_distance: .003125
+endstop_pin: ^!ar15
+
+# The stepper_c section describes the stepper controlling the rear
+# tower (at 90 degrees).
+[stepper_c]
+step_pin: ar46
+dir_pin: ar48
+enable_pin: !ar62
+step_distance: .003125
+endstop_pin: ^!ar19
+
+[extruder]
+step_pin: ar26
+dir_pin: !ar28
+enable_pin: !ar24
+step_distance: .00230
+nozzle_diameter: 0.35
+filament_diameter: 2.8
+heater_pin: ar10
+sensor_type: Honeywell 100K 135-104LAG-J01
+sensor_pin: analog13
+#control: pid
+#pid_Kp: 29.191
+#pid_Ki: 1.946
+#pid_Kd: 109.466
+min_temp: 0
+max_temp: 240
+max_extrude_only_distance: 300.0
+#   Maximum length (in mm of raw filament) that a retraction or
+#   extrude-only move may have. If a retraction or extrude-only move
+#   requests a distance greater than this value it will cause an error
+#   to be returned. The default is 50mm.
+max_extrude_only_velocity: 20
+#max_extrude_only_accel:
+#   Maximum velocity (in mm/s) and acceleration (in mm/s^2) of the
+#   extruder motor for retractions and extrude-only moves. These
+#   settings do not place any limit on normal printing moves. If not
+#   specified then they are calculated to match the limit an XY
+#   printing move with a cross section of 4.0*nozzle_diameter^2 would
+#   have.
+max_extrude_cross_section: 0.6
+#   Maximum area (in mm^2) of an extrusion cross section (eg,
+#   extrusion width multiplied by layer height). This setting prevents
+#   excessive amounts of extrusion during relatively small XY moves.
+#   If a move requests an extrusion rate that would exceed this value
+#   it will cause an error to be returned. The default is: 4.0 *
+#   nozzle_diameter^2
+
+
+[heater_bed]
+heater_pin: ar8
+sensor_type: EPCOS 100K B57560G104F
+sensor_pin: analog14
+control: watermark
+min_temp: 0
+max_temp: 130
+
+# Print cooling fan (omit section if fan not present).
+#[fan]
+#pin: ar9
+#[heater_fan my_nozzle_fan]
+#pin: ar9
+#heater: extruder
+#heater_temp: 50.0
+#fan_speed: 1.0
+
+
+[mcu]
+serial: /dev/ttyACM0
+pin_map: arduino
+
+[printer]
+kinematics: delta
+#   This option must be "delta" for linear delta printers.
+max_velocity: 130
+#   Maximum velocity (in mm/s) of the toolhead relative to the
+#   print. This parameter must be specified.
+max_accel: 2700
+#   Maximum acceleration (in mm/s^2) of the toolhead relative to the
+#   print. This parameter must be specified.
+max_z_velocity: 31
+#   For delta printers this limits the maximum velocity (in mm/s) of
+#   moves with z axis movement. This setting can be used to reduce the
+#   maximum speed of up/down moves (which require a higher step rate
+#   than other moves on a delta printer). The default is to use
+#   max_velocity for max_z_velocity.
+minimum_z_position: -6
+#   The minimum Z position that the user may command the head to move
+#   to.  The default is 0.
+#delta_radius: 234.84
+#   Radius (in mm) of the horizontal circle formed by the three linear
+#   axis towers. This parameter may also be calculated as:
+#    delta_radius = smooth_rod_offset - effector_offset - carriage_offset
+#   This parameter must be provided.
+
+# The delta_calibrate section enables a DELTA_CALIBRATE extended
+# g-code command that can calibrate the tower endstop positions and
+# angles.
+[delta_calibrate]
+radius: 100
+#   Radius (in mm) of the area that may be probed. This is the radius
+#   of nozzle coordinates to be probed; if using an automatic probe
+#   with an XY offset then choose a radius small enough so that the
+#   probe always fits over the bed. This parameter must be provided.
+speed: 50
+#   The speed (in mm/s) of non-probing moves during the calibration.
+#   The default is 50.
+horizontal_move_z: 2
+#   The height (in mm) that the head should be commanded to move to
+#   just prior to starting a probe operation. The default is 5.
+# samples: 1
+#   The number of times to probe each point.  The probed z-values will
+#   be averaged. The default is to probe 1 time.
+# sample_retract_dist: 2.0
+#   The distance (in mm) to retract between each sample if sampling
+#   more than once. The default is 2mm.
+#
+#
+# Z height probe. One may define this section to enable Z height
+# probing hardware. When this section is enabled, PROBE and
+# QUERY_PROBE extended g-code commands become available. The probe
+# section also creates a virtual "probe:z_virtual_endstop" pin. One
+# may set the stepper_z endstop_pin to this virtual pin on cartesian
+# style printers that use the probe in place of a z endstop. If using
+# "probe:z_virtual_endstop" then do not define a position_endstop in
+# the stepper_z config section.
+[probe]
+pin: ^ar18
+#   Probe detection pin. This parameter must be provided.
+x_offset: 58.5
+#   The distance (in mm) between the probe and the nozzle along the
+#   x-axis. The default is 0.
+y_offset: -42.3
+#   The distance (in mm) between the probe and the nozzle along the
+#   y-axis. The default is 0.
+z_offset:10.099
+#   The distance (in mm) between the bed and the nozzle when the probe
+#   triggers. This parameter must be provided.
+speed: 5.0
+#   Speed (in mm/s) of the Z axis when probing. The default is 5mm/s.
+#
+
+# Pause/Resume functionality with support of position capture and restore
+[pause_resume]
+recover_velocity: 50.
+#   When capture/restore is enabled, the speed at which to return to
+#   the captured position (in mm/s).  Default is 50.0 mm/s.
+
+
+[display]
+lcd_type: st7920
+cs_pin: ar16
+sclk_pin: ar23
+sid_pin: ar17
+encoder_pins: ^ar31, ^ar33
+click_pin: ^!ar35
+#kill_pin: ^!ar41
+
+#*# <---------------------- SAVE_CONFIG ---------------------->
+#*# DO NOT EDIT THIS BLOCK OR BELOW. The contents are auto-generated.
+#*#
+#*# [printer]
+#*# delta_radius = 233.164890
+#*#
+#*# [stepper_a]
+#*# angle = 210.189461
+#*# arm_length = 426.510000
+#*# position_endstop = 454.745605
+#*#
+#*# [stepper_b]
+#*# angle = 330.144724
+#*# arm_length = 426.510000
+#*# position_endstop = 454.647401
+#*#
+#*# [stepper_c]
+#*# angle = 90.000000
+#*# arm_length = 426.510000
+#*# position_endstop = 454.556912
+#*#
+#*# [extruder]
+#*# control = pid
+#*# pid_kp = 29.075
+#*# pid_ki = 1.864
+#*# pid_kd = 113.394
+#*#
+#*# [delta_calibrate]
+#*# height0 = 0.0
+#*# height0_pos = 145520.000,145486.000,145458.000
+#*# height1 = 0.0
+#*# height1_pos = 160526.000,160382.000,130618.000
+#*# height2 = 0.0
+#*# height2_pos = 139936.000,170698.000,139825.000
+#*# height3 = 0.0
+#*# height3_pos = 131820.000,158364.000,158294.000
+#*# height4 = 0.0
+#*# height4_pos = 140474.000,140508.000,163739.000
+#*# height5 = 0.0
+#*# height5_pos = 156343.000,133018.000,156329.000
+#*# height6 = 0.0
+#*# height6_pos = 167146.000,140089.000,140094.000
